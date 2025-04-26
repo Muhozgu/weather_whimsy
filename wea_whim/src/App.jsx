@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [city, setCity] = useState('');
+  const [weather, setWeather] = useState(null);
+
+  const fetchWeather = async () => {
+    if (!city) return;  //https://api.weatherbit.io/v2.0/current?lat=35.7796&lon=-78.6382&key=API_KEY&include=minutely
+
+    const res = await fetch(`https://api.weatherbit.io/v2.0/current?city=${city}&key=193c6045931f405189d9ae9ce78af351&include=minutely`);
+    const data = await res.json();
+    setWeather(data);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <h1 className="title">Weather Whimpsey</h1>
+      <div className="search-container">
+        <input
+          placeholder="Enter city"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="input"
+        />
+        <button onClick={fetchWeather} className="button">Search</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      {weather && (
+        <div className="card">
+          <h2>{weather.location.name}</h2>
+          <p className="temp">{weather.current.temp_c}&deg;C</p>
+          <p className="condition">{weather.current.condition.text}</p>
+        </div>
+      )}
+    </div>
+  );
 }
-
-export default App
